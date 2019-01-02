@@ -1,3 +1,4 @@
+import com.github.marcoferrer.krotoplus.coroutines.launchProducerJob
 import com.github.marcoferrer.krotoplus.coroutines.withCoroutineContext
 import io.grpc.Channel
 import io.grpc.Server
@@ -26,7 +27,7 @@ suspend fun main(){
         // Optional coroutineContext. Default is Dispatchers.Unconfined
         val stub = GreeterCoroutineGrpc
             .newStub(channel)
-            .withCoroutineContext(Dispatchers.IO)
+            .withCoroutineContext()
 
         performUnaryCall(stub)
 
@@ -61,11 +62,10 @@ suspend fun CoroutineScope.performClientStreamingCall(stub: GreeterCoroutineGrpc
     // Client Streaming RPC
     val (requestChannel, response) = stub.sayHelloClientStreaming()
 
-    launch {
+    launchProducerJob(requestChannel){
         repeat(5){
-            requestChannel.send { name = "person #$it" }
+            send { name = "person #$it" }
         }
-        requestChannel.close()
     }
 
     println("Client Streaming Response: ${response.await().toString().trim()}")
@@ -75,16 +75,13 @@ suspend fun CoroutineScope.performBidiCall(stub: GreeterCoroutineGrpc.GreeterCor
 
     val (requestChannel, responseChannel) = stub.sayHelloStreaming()
 
-    launch {
+    launchProducerJob(requestChannel){
         repeat(5){
-            requestChannel.send { name = "person #$it" }
+            send { name = "person #$it" }
         }
-        requestChannel.close()
     }
 
-    launch {
-        responseChannel.consumeEach {
-            println("Bidi Response: ${it.message}")
-        }
+    responseChannel.consumeEach {
+        println("Bidi Response: ${it.message}")
     }
 }
