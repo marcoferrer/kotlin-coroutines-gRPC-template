@@ -2,7 +2,6 @@ import io.grpc.Status
 import io.grpc.examples.helloworld.GreeterCoroutineGrpc
 import io.grpc.examples.helloworld.HelloReply
 import io.grpc.examples.helloworld.HelloRequest
-import io.grpc.examples.helloworld.HelloWorldProtoBuilders
 import kotlinx.coroutines.channels.*
 import kotlinx.coroutines.coroutineScope
 
@@ -13,9 +12,9 @@ class GreeterService : GreeterCoroutineGrpc.GreeterImplBase() {
     override suspend fun sayHello(request: HelloRequest): HelloReply  = coroutineScope {
 
         if (request.name.matches(validNameRegex)) {
-            HelloWorldProtoBuilders.HelloReply{
-                message = "Hello there, ${request.name}!"
-            }
+            HelloReply.newBuilder()
+                .setMessage("Hello there, ${request.name}!")
+                .build()
         } else {
             throw Status.INVALID_ARGUMENT.asRuntimeException()
         }
@@ -39,9 +38,9 @@ class GreeterService : GreeterCoroutineGrpc.GreeterImplBase() {
         requestChannel: ReceiveChannel<HelloRequest>
     ): HelloReply = coroutineScope {
 
-        HelloWorldProtoBuilders.HelloReply{
-            message = requestChannel.toList().joinToString()
-        }
+        HelloReply.newBuilder()
+            .setMessage(requestChannel.toList().joinToString())
+            .build()
     }
 
     override suspend fun sayHelloServerStreaming(request: HelloRequest, responseChannel: SendChannel<HelloReply>) {

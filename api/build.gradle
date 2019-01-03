@@ -10,7 +10,6 @@ dependencies {
     implementation "com.google.protobuf:protobuf-java:$protobuf_version"
     implementation "io.grpc:grpc-protobuf:$grpc_version"
     implementation "io.grpc:grpc-stub:$grpc_version"
-    implementation "io.grpc:grpc-netty:$grpc_version"
 }
 
 protobuf {
@@ -21,30 +20,18 @@ protobuf {
     //noinspection GroovyAssignabilityCheck
     plugins {
         grpc { artifact = "io.grpc:protoc-gen-grpc-java:$grpc_version" }
-        kroto {
-            artifact = "com.github.marcoferrer.krotoplus:protoc-gen-kroto-plus:$krotoplus_version:jvm8@jar"
+        coroutines {
+            artifact = "com.github.marcoferrer.krotoplus:protoc-gen-grpc-coroutines:$krotoplus_version:jvm8@jar"
         }
     }
 
     generateProtoTasks {
-        def krotoConfig = file("krotoPlusConfig.asciipb")
 
         all().each{ task ->
-            // Adding the config file to the task inputs lets UP-TO-DATE checks
-            // include changes to configuration
-            task.inputs.files krotoConfig
 
             task.plugins {
                 grpc {}
-                kroto {
-                    // We set the kroto output directory to match the java output directory
-                    // so that we can use the kotlin DslMarker annotation in our protobuf 
-                    // message builders. If you are not using the kroto option 'use_dsl_markers: true'
-                    // then you don't need to take any care with 'outputSubDir' 
-                    outputSubDir = "java"
-                    
-                    option "ConfigPath=$krotoConfig"
-                }
+                coroutines {}
             }
         }
     }
