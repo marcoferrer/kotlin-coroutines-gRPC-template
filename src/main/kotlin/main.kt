@@ -57,7 +57,7 @@ suspend fun performServerStreamingCall(stub: GreeterCoroutineGrpc.GreeterCorouti
     }
 }
 
-suspend fun CoroutineScope.performClientStreamingCall(stub: GreeterCoroutineGrpc.GreeterCoroutineStub){
+suspend fun performClientStreamingCall(stub: GreeterCoroutineGrpc.GreeterCoroutineStub) = coroutineScope{
 
     // Client Streaming RPC
     val (requestChannel, response) = stub.sayHelloClientStreaming()
@@ -71,7 +71,7 @@ suspend fun CoroutineScope.performClientStreamingCall(stub: GreeterCoroutineGrpc
     println("Client Streaming Response: ${response.await().toString().trim()}")
 }
 
-suspend fun CoroutineScope.performBidiCall(stub: GreeterCoroutineGrpc.GreeterCoroutineStub){
+suspend fun performBidiCall(stub: GreeterCoroutineGrpc.GreeterCoroutineStub) = coroutineScope {
 
     val (requestChannel, responseChannel) = stub.sayHelloStreaming()
 
