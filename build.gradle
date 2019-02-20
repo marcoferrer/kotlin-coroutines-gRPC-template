@@ -30,9 +30,7 @@ dependencies {
     implementation "io.grpc:grpc-protobuf-lite:$grpc_version"
     implementation 'javax.annotation:javax.annotation-api:1.2'
 
-    implementation ("com.github.marcoferrer.krotoplus:kroto-plus-coroutines:$krotoplus_version"){
-        exclude group: 'io.grpc'
-    }
+    implementation ("com.github.marcoferrer.krotoplus:kroto-plus-coroutines:$krotoplus_version")
     
     implementation project(':api')
 }
