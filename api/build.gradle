@@ -3,6 +3,12 @@ apply plugin: 'com.google.protobuf'
 apply plugin: 'idea'
 
 dependencies {
+
+    // For jdk 9+ you need to include javax.annotations
+    // The reason is outlined in this grpc issue
+    // https://github.com/grpc/grpc-java/issues/4725
+    compileOnly "javax.annotation:javax.annotation-api:1.2"
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     
