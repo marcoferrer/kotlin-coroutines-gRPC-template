@@ -2,12 +2,21 @@ import io.grpc.Status
 import io.grpc.examples.helloworld.GreeterCoroutineGrpc
 import io.grpc.examples.helloworld.HelloReply
 import io.grpc.examples.helloworld.HelloRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.toList
+import kotlin.coroutines.CoroutineContext
 
 class GreeterService : GreeterCoroutineGrpc.GreeterImplBase() {
+
+    val myThreadLocal = ThreadLocal.withInitial { "value" }.asContextElement()
+
+    override val initialContext: CoroutineContext
+        get() = Dispatchers.Default + myThreadLocal
+
 
     private val validNameRegex = Regex("[^0-9]*")
 
