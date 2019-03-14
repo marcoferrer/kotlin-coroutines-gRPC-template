@@ -2,20 +2,29 @@ import io.grpc.Status
 import io.grpc.examples.helloworld.GreeterCoroutineGrpc
 import io.grpc.examples.helloworld.HelloReply
 import io.grpc.examples.helloworld.HelloRequest
-import io.grpc.examples.helloworld.HelloWorldProtoBuilders
-import kotlinx.coroutines.channels.*
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asContextElement
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.toList
+import kotlin.coroutines.CoroutineContext
 
 class GreeterService : GreeterCoroutineGrpc.GreeterImplBase() {
 
+    val myThreadLocal = ThreadLocal.withInitial { "value" }.asContextElement()
+
+    override val initialContext: CoroutineContext
+        get() = Dispatchers.Default + myThreadLocal
+
     private val validNameRegex = Regex("[^0-9]*")
 
-    override suspend fun sayHello(request: HelloRequest): HelloReply  = coroutineScope {
+    override suspend fun sayHello(request: HelloRequest): HelloReply  {
 
         if (request.name.matches(validNameRegex)) {
-            HelloWorldProtoBuilders.HelloReply{
-                message = "Hello there, ${request.name}!"
-            }
+            return HelloReply.newBuilder()
+                .setMessage("Hello there, ${request.name}!")
+                .build()
         } else {
             throw Status.INVALID_ARGUMENT.asRuntimeException()
         }
@@ -25,32 +34,27 @@ class GreeterService : GreeterCoroutineGrpc.GreeterImplBase() {
         requestChannel: ReceiveChannel<HelloRequest>,
         responseChannel: SendChannel<HelloReply>
     ) {
-        coroutineScope {
+        requestChannel.consumeEach { request ->
 
-            requestChannel.consumeEach { request ->
-
-                responseChannel
-                    .send { message = "Hello there, ${request.name}!" }
-            }
+            responseChannel
+                .send { message = "Hello there, ${request.name}!" }
         }
     }
 
     override suspend fun sayHelloClientStreaming(
         requestChannel: ReceiveChannel<HelloRequest>
-    ): HelloReply = coroutineScope {
+    ): HelloReply {
 
-        HelloWorldProtoBuilders.HelloReply{
-            message = requestChannel.toList().joinToString()
-        }
+        return HelloReply.newBuilder()
+            .setMessage(requestChannel.toList().joinToString())
+            .build()
     }
 
     override suspend fun sayHelloServerStreaming(request: HelloRequest, responseChannel: SendChannel<HelloReply>) {
-        coroutineScope {
-            for(char in request.name) {
 
-                responseChannel.send {
-                    message = "Hello $char!"
-                }
+        for(char in request.name) {
+            responseChannel.send {
+                message = "Hello $char!"
             }
         }
     }
