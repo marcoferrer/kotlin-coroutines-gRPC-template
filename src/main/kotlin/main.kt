@@ -22,21 +22,20 @@ val channel: Channel = InProcessChannelBuilder
     .build()
 
 suspend fun main(){
-    coroutineScope {
 
-        // Optional coroutineContext. Default is Dispatchers.Unconfined
-        val stub = GreeterCoroutineGrpc
-            .newStub(channel)
-            .withCoroutineContext()
+    // Optional coroutineContext. Default is Dispatchers.Unconfined
+    val stub = GreeterCoroutineGrpc
+        .newStub(channel)
+        .withCoroutineContext()
 
-        performUnaryCall(stub)
+    performUnaryCall(stub)
 
-        performBidiCall(stub)
+    performBidiCall(stub)
 
-        performClientStreamingCall(stub)
+    performClientStreamingCall(stub)
 
-        performServerStreamingCall(stub)
-    }
+    performServerStreamingCall(stub)
+
 
     server.shutdown()
 }
