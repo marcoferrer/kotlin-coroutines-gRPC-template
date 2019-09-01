@@ -23,7 +23,7 @@ val channel: Channel = InProcessChannelBuilder
 
 suspend fun main(){
 
-    // Optional coroutineContext. Default is Dispatchers.Unconfined
+    // Optional coroutineContext. Default is EmptyCoroutineContext
     val stub = GreeterCoroutineGrpc
         .newStub(channel)
         .withCoroutineContext()
@@ -72,6 +72,7 @@ suspend fun performClientStreamingCall(stub: GreeterCoroutineGrpc.GreeterCorouti
 
 suspend fun performBidiCall(stub: GreeterCoroutineGrpc.GreeterCoroutineStub) = coroutineScope {
 
+    //Bi-Directional Streaming RPC
     val (requestChannel, responseChannel) = stub.sayHelloStreaming()
 
     launchProducerJob(requestChannel){

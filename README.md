@@ -19,3 +19,14 @@ This template covers:
   * Client Streaming
   * Server Streaming
   * BiDirectional Streaming
+
+
+
+Task :run FAILED 
+Unary Response: Hello there, John! 
+Bidi Response: Hello there, person #0! 
+Bidi Response: Hello there, person #1! 
+Bidi Response: Hello there, person #2! 
+Bidi Response: Hello there, person #3! 
+Bidi Response: Hello there, person #4! 
+Exception in thread "main" io.grpc.StatusRuntimeException: UNKNOWN: Receiver class com.github.marcoferrer.krotoplus.coroutines.server.ServerRequestStreamChannel does not define or inherit an implementation of the resolved method abstract cancel(Ljava/util/concurrent/CancellationException;)V of interface kotlinx.coroutines.channels.ReceiveChannel.
